@@ -57,7 +57,7 @@ function App() {
     setJustSearched(true);
     setTimeout(() => setJustSearched(false), 1000);
 
-    const searchString = searchInput; 
+    let searchString = searchInput.replace(/\s/g, ''); // remove all spaces
     console.log('search is: ', searchString);
 
     /* ADD: code for google search api goes here */
