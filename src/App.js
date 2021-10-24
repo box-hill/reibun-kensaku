@@ -7,7 +7,7 @@ import 'firebase/compat/auth';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
-import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { faQuestionCircle, faSearch } from '@fortawesome/free-solid-svg-icons';
 
 function App() {
   const db = firebase.firestore(); // initialise your database
@@ -70,7 +70,11 @@ function NavItem(props) {
 
 function NavSearchBar() {
   return (
-    <input type="text" maxLength="25" placeholder="Type some japanese here" className="nav-search-bar"></input>
+    <div>
+    <input type="text" maxLength="25" placeholder="Type some japanese here" className="nav-search-bar">
+    </input>
+    <button className="nav-search-bar-button"><FontAwesomeIcon icon={faSearch}/>Search</button>
+    </div>
   );
 }
 
