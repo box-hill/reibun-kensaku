@@ -5,6 +5,9 @@ import firebase from "./firebase";
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 
 function App() {
   const db = firebase.firestore(); // initialise your database
@@ -31,12 +34,43 @@ function App() {
 
   }
 
-  testWrite();
-
   return (
-    <div> Initiating file test 123 123
-
+    <div>
+      <Navbar>
+        <div className="nav-search">
+          <NavSearchBar/>
+        </div>
+        <div className="nav-items">
+          <NavItem text="Sign in" icon={faGoogle}></NavItem>
+          <NavItem text="About" icon={faQuestionCircle}></NavItem>
+        </div>
+      </Navbar>
     </div>
+  );
+}
+
+function Navbar(props) {
+  return (
+    <nav className="navbar">
+      <ul className="navbar-nav"> { props.children }</ul>
+    </nav>
+  );
+}
+
+function NavItem(props) {
+  return (
+    <li className="nav-item">
+      
+      <button herf="#" className="text-button">
+      <FontAwesomeIcon icon={props.icon}/> {props.text}
+      </button>
+    </li>
+  );
+}
+
+function NavSearchBar() {
+  return (
+    <input type="text" maxLength="25" placeholder="Type some japanese here" className="nav-search-bar"></input>
   );
 }
 
