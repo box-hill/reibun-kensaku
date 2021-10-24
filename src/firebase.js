@@ -1,14 +1,17 @@
 import firebase from "firebase/compat/app";
+const { REACT_APP_FIREBASE_API, REACT_APP_FIREBASE_AUTHDOMAIN, REACT_APP_FIREBASE_PROJECTID, REACT_APP_FIREBASE_STORAGEBUCKET, REACT_APP_FIREBASE_MESSAGINGSENDERID, REACT_APP_FIREBASE_APPID } = process.env;
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDqKHML7jRE3g3pxva7DHMxVDCZFwm6j14",
-    authDomain: "reibun-kensaku.firebaseapp.com",
-    projectId: "reibun-kensaku",
-    storageBucket: "reibun-kensaku.appspot.com",
-    messagingSenderId: "697365377881",
-    appId: "1:697365377881:web:78c42a2d5bde7122f0d248"
+    apiKey: REACT_APP_FIREBASE_API,
+    authDomain: REACT_APP_FIREBASE_AUTHDOMAIN,
+    projectId: REACT_APP_FIREBASE_PROJECTID,
+    storageBucket: REACT_APP_FIREBASE_STORAGEBUCKET,
+    messagingSenderId: REACT_APP_FIREBASE_MESSAGINGSENDERID,
+    appId: REACT_APP_FIREBASE_APPID
 };
 
 firebase.initializeApp(firebaseConfig);
 
 export default firebase;
+
+

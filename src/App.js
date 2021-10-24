@@ -11,10 +11,12 @@ import { faQuestionCircle, faSearch } from '@fortawesome/free-solid-svg-icons';
 
 import React, { useState, useEffect } from 'react';
 
+const { REACT_APP_GOOGLE_API } = process.env;
+
 function App() {
 
   const [loggedIn, setLoggedIn] = useState(false);
-  const [searchInput, setSearchInput] = useState(undefined);
+  const [searchInput, setSearchInput] = useState('');
   const [justSearched, setJustSearched] = useState(false);
 
   // check if user is logged in
@@ -62,7 +64,7 @@ function App() {
 
     /* ADD: code for google search api goes here */
     // string manipulation can go somewhere else.
-    let url = `https://www.googleapis.com/customsearch/v1?key=AIzaSyCUMupOrK0nmg2uA8ez9XfA2_7aEEadAXg&cx=22519e5637b61b1c8&start=20&q=\"${searchString}"`;
+    let url = `https://www.googleapis.com/customsearch/v1?key=${REACT_APP_GOOGLE_API}&cx=22519e5637b61b1c8&start=20&q=\"${searchString}"`;
     fetch(url, {mode: 'cors'})
     .then((response) => {
         return response.json();
