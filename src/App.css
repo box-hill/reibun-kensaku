@@ -47,7 +47,6 @@ a {
 .nav-items {
   display: flex;
   flex-wrap: nowrap;
-
 }
 
 .nav-item {
@@ -61,5 +60,10 @@ a {
 .text-button {
   margin: 5px;
   height: calc(var(--nav-size) * 0.5);
-  background: white;
+  background: rgb(119, 119, 119);
+  transition: all 0.3s ease;
+}
+
+.text-button:hover { 
+  filter: brightness(120%);
 }
