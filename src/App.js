@@ -59,9 +59,21 @@ function App() {
 
     const searchString = searchInput; 
     console.log('search is: ', searchString);
-    
+
     /* ADD: code for google search api goes here */
     // string manipulation can go somewhere else.
+    let url = `https://www.googleapis.com/customsearch/v1?key=AIzaSyCUMupOrK0nmg2uA8ez9XfA2_7aEEadAXg&cx=22519e5637b61b1c8&start=20&q=\"${searchString}"`;
+    fetch(url, {mode: 'cors'})
+    .then((response) => {
+        return response.json();
+    })
+    .then((response) => {
+        console.log(response);
+        // set results state here
+    })
+    .catch((error) => {
+        console.log(error);
+    });
     
     // check if user is logged in, and then write to firestore to save user's search
     if( loggedIn ) {
@@ -127,8 +139,10 @@ function NavItem(props) {
 
 function NavSearchBar(props) {
   return (
-    <form>
-    <input type="text" maxLength="25" placeholder="Type some japanese here" className="nav-search-bar" id="search-input" onChange={props.handleChange}>
+    <form autoComplete="off">
+    <input type="text" maxLength="25" placeholder="Type some japanese here" 
+    autoComplete="false" className="nav-search-bar" 
+    onChange={props.handleChange}>
     </input>
     <button className="nav-search-bar-button" onClick={props.search}><FontAwesomeIcon icon={faSearch}/>Search</button>
     </form>
