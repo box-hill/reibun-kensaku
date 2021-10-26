@@ -117,3 +117,23 @@ a {
     transform: scale(0.5);
   }
 }
+
+.error-center {
+  text-align: center;
+}
+
+.error-emoji {
+  font-size: 100px;
+  margin-bottom: 20px;
+  color: gray;
+}
+
+.error-jap {
+  margin-top: 20px;
+}
+
+@media screen and (max-width:900px) {
+  .error-emoji {
+    font-size: 50px
+  }
+}

@@ -19,7 +19,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [justSearched, setJustSearched] = useState(false);
-
+  const [results, setResults] = useState([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
 
   // check if user is logged in
@@ -56,14 +56,13 @@ function App() {
 
   function search(e) {
     e.preventDefault();
-
-    // only allow 1 search a second
+    // only allow one search a second
     if( justSearched ) return; 
     setJustSearched(true);
     setTimeout(() => setJustSearched(false), 1000);
 
-    setLoadingSearch(true);
-    console.log(loadingSearch);
+    setResults([]); // erase previous results
+    setLoadingSearch(true); // mount loader
 
     let searchString = searchInput.replace(/\s/g, ''); // remove all spaces
     console.log('search is: ', searchString);
@@ -76,9 +75,11 @@ function App() {
         return response.json();
     })
     .then((response) => {
+        console.log('search response: ');
         console.log(response);
-        // set results state here
 
+        setResults(response.items);        
+        setTimeout(() => console.log(results), 500);
         setLoadingSearch(false);
     })
     .catch((error) => {
@@ -106,11 +107,10 @@ function App() {
         })
       /* ADD: code to delete once searches get past 100*/
     }
-
+     
   }
 
   function handleChange(e) {
-    console.log(e.target.value);
     setSearchInput(e.target.value);
   }
 
@@ -126,6 +126,7 @@ function App() {
         </div>
       </Navbar>
       <Loader loading={loadingSearch}/>
+      <Card results={results}/>
     </div>
   );
 }
@@ -157,6 +158,25 @@ function NavSearchBar(props) {
     </input>
     <button className="nav-search-bar-button" onClick={props.search}><FontAwesomeIcon icon={faSearch}/>Search</button>
     </form>
+  );
+}
+
+function Card(props) {
+  if(props.results === undefined) {
+    return (
+      <div className='error-center'>
+        <div className='error-emoji'>(╯°□°)╯︵ ┻━┻</div>
+        <div>Can't find any matching sentences.</div>
+        <div>Try changing your search.</div>
+        <div className='error-jap'>フレーズに該当する例文が見つかりません。</div>
+        <div>フレーズを変更して検索してください。</div>
+      </div>
+    );
+  }
+  return (
+    <div>
+      {props.results.map((result, index) => {return <div key={index}>{result.title}</div>})}
+    </div>
   );
 }
 
