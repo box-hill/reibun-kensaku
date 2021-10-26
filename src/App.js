@@ -1,5 +1,6 @@
 
 import './App.css';
+import Loader from './components/Loader';
 
 import firebase from "./firebase";
 import 'firebase/compat/firestore';
@@ -18,6 +19,8 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [justSearched, setJustSearched] = useState(false);
+
+  const [loadingSearch, setLoadingSearch] = useState(false);
 
   // check if user is logged in
   function checkUser(){
@@ -59,6 +62,9 @@ function App() {
     setJustSearched(true);
     setTimeout(() => setJustSearched(false), 1000);
 
+    setLoadingSearch(true);
+    console.log(loadingSearch);
+
     let searchString = searchInput.replace(/\s/g, ''); // remove all spaces
     console.log('search is: ', searchString);
 
@@ -72,6 +78,8 @@ function App() {
     .then((response) => {
         console.log(response);
         // set results state here
+
+        setLoadingSearch(false);
     })
     .catch((error) => {
         console.log(error);
@@ -117,6 +125,7 @@ function App() {
           <NavItem text="About" icon={faQuestionCircle}></NavItem>
         </div>
       </Navbar>
+      <Loader loading={loadingSearch}/>
     </div>
   );
 }
