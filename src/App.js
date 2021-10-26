@@ -1,6 +1,7 @@
 
 import './App.css';
 import Loader from './components/Loader';
+import Card from './components/Card';
 
 import firebase from "./firebase";
 import 'firebase/compat/firestore';
@@ -20,12 +21,14 @@ function App() {
   const [searchInput, setSearchInput] = useState('');
   const [justSearched, setJustSearched] = useState(false);
   const [results, setResults] = useState([]);
+  const [history, setHistory] = useState([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(true);
 
   // check if user is logged in
   function checkUser(){
     firebase.auth().onAuthStateChanged(function(user) {
-        if(user) {
+        if(user){
             setLoggedIn(true);
             console.log('user is logged in ');
         } else { 
@@ -37,8 +40,42 @@ function App() {
 
   useEffect(() => {
     checkUser();
+    retrieveHistory();
   }, [])
-  
+
+  useEffect(() => {
+    retrieveHistory();
+  }, [loggedIn])
+
+  useEffect(() => { // setLoadingHistory to false once history stops updating.
+    setLoadingHistory(false);
+  }, [history])
+
+  function retrieveHistory(){
+    // check if user is logged in, and then retrieve History
+    if(loggedIn){
+      setLoadingHistory(true);
+      const user = firebase.auth().currentUser;
+      const uniqueId = user.uid;
+
+      const db = firebase.firestore(); // initialise your database
+      const docRef = db.collection('users').doc(uniqueId).collection('searches');
+
+      docRef.get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          //console.log(doc.data().text);
+          setHistory(prevData => [...prevData, doc.data().text]);
+        })
+      })
+      .catch((error => {
+        console.log("Error getting documents: ", error);
+      }))
+      console.log('Retrieved History: ', history);
+      
+    }
+  }
+
   function googleLogin() {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider)
@@ -57,7 +94,7 @@ function App() {
   function search(e) {
     e.preventDefault();
     // only allow one search a second
-    if( justSearched ) return; 
+    if(justSearched) return; 
     setJustSearched(true);
     setTimeout(() => setJustSearched(false), 1000);
 
@@ -87,7 +124,7 @@ function App() {
     });
     
     // check if user is logged in, and then write to firestore to save user's search
-    if( loggedIn ) {
+    if(loggedIn) {
         const user = firebase.auth().currentUser;
         const uniqueId = user.uid;
 
@@ -115,7 +152,7 @@ function App() {
   }
 
   return (
-    <div>
+    <div className='app'>
       <Navbar>
         <div className="nav-search">
           <NavSearchBar search={search} handleChange={handleChange}/>
@@ -125,10 +162,41 @@ function App() {
           <NavItem text="About" icon={faQuestionCircle}></NavItem>
         </div>
       </Navbar>
-      <Loader loading={loadingSearch}/>
-      <Card results={results}/>
+      <div className='main-content'>
+        <Card results={results} loading={loadingSearch}/>
+        <History loading={loadingHistory} loggedIn={loggedIn} history={history}/>
+      </div>
     </div>
   );
+}
+
+function History(props) {
+  if(!props.loggedIn){
+    return (
+      <div className='history'>
+        Log to view hist
+      </div>
+    )
+  }
+  if(props.loading){
+    return (
+      <div className='history'>
+        <div id='loader'>
+          <Loader loading={props.loading}/>
+        </div>
+      </div>
+    );
+  }
+  if(props.history.length !== 0){
+    return (
+      <div className='history'>
+        {props.history.map((search, index) => {
+          return <div key={index} className='history-item'>{search}</div>
+        })}
+      </div>
+    );
+  }
+  return (null);
 }
 
 function Navbar(props) {
@@ -161,23 +229,6 @@ function NavSearchBar(props) {
   );
 }
 
-function Card(props) {
-  if(props.results === undefined) {
-    return (
-      <div className='error-center'>
-        <div className='error-emoji'>(╯°□°)╯︵ ┻━┻</div>
-        <div>Can't find any matching sentences.</div>
-        <div>Try changing your search.</div>
-        <div className='error-jap'>フレーズに該当する例文が見つかりません。</div>
-        <div>フレーズを変更して検索してください。</div>
-      </div>
-    );
-  }
-  return (
-    <div>
-      {props.results.map((result, index) => {return <div key={index}>{result.title}</div>})}
-    </div>
-  );
-}
+
 
 export default App;

@@ -1,12 +1,15 @@
 :root {
-  --bg: rgb(33,33,33);
+  --bg:  #202124;
+  --bg-nav:  #24292f;
   --bg-accent: #484a4d;
   --text-color: #dadce1;
   --nav-size: 60px;
+  --border-color: #d0d7de;
 }
 
 * {
   box-sizing: border-box;
+  font-family: Helvetica, sans-serif, Arial;
 }
 
 body, #root {
@@ -26,9 +29,13 @@ a {
 
 .navbar {
   height: var(--nav-size);
-  background-color: var(--bg);
+  width: 100%;
+  
+  background-color: var(--bg-nav);
   padding: 0 1rem;
-  border-bottom: var(--border);
+  /* border-bottom: var(--border); */
+  position: fixed;
+  top: 0;
 }
 
 .navbar-nav {
@@ -75,9 +82,25 @@ a {
   filter: brightness(120%);
 }
 
+.results-container {
+  grid-column: 2;
+  grid-row: 1;
+  background: #f6f8fa;
+  height: 100%;
+}
+
 /* Loader */
+#loader {
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 200px auto;
+  /* background: white; */
+}
+
 .spinner {
-  margin: 100px auto 0;
+  /* margin: 100px auto 0; */
   width: 70px;
   text-align: center;
 }
@@ -85,7 +108,7 @@ a {
 .spinner > div {
   width: 18px;
   height: 18px;
-  background-color: #333;
+  background-color: rgb(12, 22, 44);
 
   border-radius: 100%;
   display: inline-block;
@@ -118,22 +141,72 @@ a {
   }
 }
 
-.error-center {
+#error-center div{
   text-align: center;
 }
 
 .error-emoji {
-  font-size: 100px;
-  margin-bottom: 20px;
-  color: gray;
+  font-size: 40px;
+  margin: 50px 0;
+  color: rgb(31, 31, 31);
 }
 
 .error-jap {
   margin-top: 20px;
 }
 
-@media screen and (max-width:900px) {
+.app {
+  height: 100vh;
+  /* background: #f6f8fa; */
+}
+
+.main-content {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 300px 1fr 200px;
+}
+
+.card {
+  padding: 20px;  
+  margin: 10px;
+  border: 1px var(--border-color) solid;
+  border-radius: 6px;
+  border-bottom-left-radius: 6px;
+
+  transition: 0.3s;
+}
+
+.card:hover {
+  background-color: rgb(218, 218, 218);
+}
+
+.card-text {
+  font-size: 18px;
+}
+
+.main-content {
+  padding-top: var(--nav-size); /* So our content starts after the nav bar*/
+}
+
+.history {
+  grid-column: 1;
+  grid-row: 1;
+  border-right: 1px var(--border-color) solid;
+}
+
+.history-item {
+  margin: 5px;
+}
+
+/* @media screen and (max-width:1500px) {
+  #results-container {
+    grid-template-columns: 2px 1fr 2px;
+  }
+} */
+
+@media screen and (max-width:800px) {
   .error-emoji {
-    font-size: 50px
+    font-size: 20px
   }
 }
+
