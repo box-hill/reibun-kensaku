@@ -101,12 +101,12 @@ function App() {
     setResults([]); // erase previous results
     setLoadingSearch(true); // mount loader
 
-    let searchString = searchInput.replace(/\s/g, ''); // remove all spaces
+    let searchString = searchInput.replace(/\s/g, ''); // remove all spaces from user's search
     console.log('search is: ', searchString);
 
     /* ADD: code for google search api goes here */
     // string manipulation can go somewhere else.
-    let url = `https://www.googleapis.com/customsearch/v1?key=${REACT_APP_GOOGLE_API}&cx=22519e5637b61b1c8&start=20&q=\"${searchString}"`;
+    let url = `https://www.googleapis.com/customsearch/v1?key=${REACT_APP_GOOGLE_API}&cx=22519e5637b61b1c8&q=\"${searchString}"`;
     fetch(url, {mode: 'cors'})
     .then((response) => {
         return response.json();
@@ -163,7 +163,7 @@ function App() {
         </div>
       </Navbar>
       <div className='main-content'>
-        <Card results={results} loading={loadingSearch}/>
+        <Card results={results} loading={loadingSearch} searchInput={searchInput}/>
         <History loading={loadingHistory} loggedIn={loggedIn} history={history}/>
       </div>
     </div>

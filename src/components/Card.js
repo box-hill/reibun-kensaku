@@ -1,6 +1,29 @@
 import Loader from './Loader';
 
 function Card(props) {
+    // The results with <b> tags contain the search term
+    // If neither the htmlSnippet or htmlTitle contains this, then the hit is likely a bad one
+    function retrieveStringInItem(resultObj) {
+        function replaceTagInString(inputString){
+            const regex = new RegExp("<b>.*</b>", "g");
+            const outputString = inputString.replaceAll(regex, props.searchInput)
+            console.log(outputString);
+            return outputString;
+        }
+        if(resultObj.htmlSnippet.includes("<b>")){
+            return replaceTagInString(resultObj.htmlSnippet);
+        }
+        if(resultObj.htmlTitle.includes("<b>")){
+            return replaceTagInString(resultObj.htmlTitle);
+        }
+        // else no good match can be found, exclude hit from results
+        return null;
+    }
+    
+    function retrieveSentenceInString(string){
+        // retrieve the sentence from the String.
+    }
+
     if(props.loading === true) {
         return (
         <div className='results-container'>
@@ -9,7 +32,6 @@ function Card(props) {
             </div>
         </div>);
     }
-    
     if(props.results === undefined) {
       return (
         <div id='error-center' className='results-container'>
@@ -32,8 +54,9 @@ function Card(props) {
                 {props.results.map((result, index) => {
                     return (
                     <div key={index} className='card'>
-                        <div className='card-text'>{result.title}</div>
-                        <div><button>Dictionary</button></div>
+                        <div>{retrieveStringInItem(result)}</div>
+                        <div className='card-text'>{result.htmlSnippet}</div>
+                        <div><button>Dictionary(?)</button></div>
                     </div>
                     )
                 })}
