@@ -19,8 +19,10 @@ function App() {
 
   const [loggedIn, setLoggedIn] = useState(false);
   const [searchInput, setSearchInput] = useState('');
+  const [searchInputParsed, setSearchInputParsed] = useState('');
   const [justSearched, setJustSearched] = useState(false);
-  const [results, setResults] = useState([]);
+
+  const [parsedResults, setParsedResults] = useState([]);
   const [history, setHistory] = useState([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
@@ -98,10 +100,11 @@ function App() {
     setJustSearched(true);
     setTimeout(() => setJustSearched(false), 1000);
 
-    setResults([]); // erase previous results
+    setParsedResults([]); // erase previous results
     setLoadingSearch(true); // mount loader
 
     let searchString = searchInput.replace(/\s/g, ''); // remove all spaces from user's search
+    setSearchInputParsed(searchString);
     console.log('search is: ', searchString);
 
     /* ADD: code for google search api goes here */
@@ -112,16 +115,95 @@ function App() {
         return response.json();
     })
     .then((response) => {
-        console.log('search response: ');
-        console.log(response);
+        console.log('search response: ', response);
 
-        setResults(response.items);        
-        setTimeout(() => console.log(results), 500);
+        // The results with <b> tags contain the search term
+        // If neither the htmlSnippet or htmlTitle contains this, then the hit is likely a bad one
+        function parseResults(resultsObj) {
+          // replace all <b>...</b> tags with the keyword searched, &nbsp HTML entities; 
+          function replaceTagInString(inputString){
+            const regexTag = new RegExp("<b>.*</b>", "g");
+            const regexHTML = new RegExp("&nbsp;", "g");
+            let outputString = inputString.replaceAll(regexTag, searchString);
+            outputString = outputString.replaceAll(regexHTML, "…");         
+            return outputString;
+          }
+          // removes the result's date if it exists in the result
+          function removeDateInString(inputString){
+            console.log('hello from removedateinstring')
+            const regex = /^\d{4}[\/\-](0?[1-9]|1[012])[\/\-]\d{2}/g;
+            const outputString = inputString.replaceAll(regex, '');
+            return outputString;
+          }
+          // extract sentence by estimating the start and end markers
+          function extractSentence(sentence){
+            let hitIndex = sentence.indexOf(searchString);
+            console.log(sentence);
+            function findIndexMarker(string, markers, hitIndex, start=true, punctuation=false){
+              // to find the start of the sentence, find the latest marker before hitIndex
+              if(start){
+                let latestStartIndex = 0;
+                markers.forEach((marker) => {
+                  let markerIndex = string.indexOf(marker) + 1; // don't include the punctuation at the start
+                  latestStartIndex = ((markerIndex > latestStartIndex) && (markerIndex < hitIndex)) ? markerIndex : latestStartIndex;
+                });
+                return latestStartIndex;
+              }
+              else{ // find the earliest end of the sentence that is after the hitIndex
+                let earliestEndIndex = string.length;
+                markers.forEach((marker) => {
+                  let markerIndex = punctuation ? string.indexOf(marker) + 1 : string.indexOf(marker); // include the punctuation if needed
+                  earliestEndIndex = ((markerIndex < earliestEndIndex) && (markerIndex > hitIndex)) ? markerIndex : earliestEndIndex;
+                });
+                return earliestEndIndex;
+              }
+            }
+            let startMarkers = [".", ";", "。", "…", "？", "?", "|","｜","！","!","→"];
+            let endMarkers = [";","|","｜","→","【", "&"];
+            let endMarkersPunc= [".", , "。", "…", "？", "?","！","!"];
+
+            let startIndex = findIndexMarker(sentence, startMarkers, hitIndex, true);
+            let endIndex = findIndexMarker(sentence, endMarkers, hitIndex, false);
+            let endIndexPunc = findIndexMarker(sentence, endMarkersPunc, hitIndex, false, true);
+
+            endIndex = (endIndexPunc < endIndex) ? endIndexPunc : endIndex;
+            return sentence.slice(startIndex, endIndex);
+          }
+          let outputArray = [];
+          // Add text and link property from our results
+          resultsObj.forEach(resultObj => {
+            let sentenceString = '';
+            if(resultObj.htmlSnippet.includes("<b>")){
+              sentenceString = replaceTagInString(resultObj.htmlSnippet);
+                //outputArray = [...outputArray, {text: replaceTagInString(resultObj.htmlSnippet), link: resultObj.link}];
+            }
+            else if(resultObj.htmlTitle.includes("<b>")){
+              sentenceString = replaceTagInString(resultObj.htmlTitle);
+            }
+            else {
+              sentenceString = null;
+              outputArray = [...outputArray, {text: null}]
+              return;
+            }              
+            // Add code to find start and end of sentences
+            sentenceString = removeDateInString(sentenceString);
+            sentenceString = extractSentence(sentenceString);
+
+            outputArray = [...outputArray, {text: sentenceString, link: resultObj.link}];
+          });
+          
+          console.log(outputArray);          
+          return outputArray;
+        }
+
+        setParsedResults(parseResults(response.items));
+        console.log(response.items);
         setLoadingSearch(false);
     })
     .catch((error) => {
         console.log(error);
     });
+    
     
     // check if user is logged in, and then write to firestore to save user's search
     if(loggedIn) {
@@ -136,9 +218,6 @@ function App() {
             text: searchString,
             searchedOn: time,
         })
-        .then((docRef) => {
-            console.log("Document written with ID: ", docRef.id, "User ID: ", uniqueId);
-        })
         .catch((error) => {
             console.error("Error addin doc: ", error);
         })
@@ -146,6 +225,8 @@ function App() {
     }
      
   }
+    // Takes an array of objects (items) from google search api
+    // Returns an array with tags removed
 
   function handleChange(e) {
     setSearchInput(e.target.value);
@@ -163,7 +244,7 @@ function App() {
         </div>
       </Navbar>
       <div className='main-content'>
-        <Card results={results} loading={loadingSearch} searchInput={searchInput}/>
+        <Card parsedResults={parsedResults} loading={loadingSearch} searchInputParsed={searchInputParsed}/>
         <History loading={loadingHistory} loggedIn={loggedIn} history={history}/>
       </div>
     </div>
