@@ -95,6 +95,14 @@ function App() {
 
   function search(e) {
     e.preventDefault();
+
+    // exit search if search input does not have a single valid Japanese character, 
+    const regex = /[\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]/
+    if(searchInput.match(regex)===null){
+      alert('Search does not contain any Japanese!');
+      return;
+    }
+
     // only allow one search a second
     if(justSearched) return; 
     setJustSearched(true);
@@ -104,11 +112,10 @@ function App() {
     setLoadingSearch(true); // mount loader
 
     let searchString = searchInput.replace(/\s/g, ''); // remove all spaces from user's search
+
     setSearchInputParsed(searchString);
     console.log('search is: ', searchString);
 
-    /* ADD: code for google search api goes here */
-    // string manipulation can go somewhere else.
     let url = `https://www.googleapis.com/customsearch/v1?key=${REACT_APP_GOOGLE_API}&cx=22519e5637b61b1c8&q=\"${searchString}"`;
     fetch(url, {mode: 'cors'})
     .then((response) => {
@@ -130,7 +137,6 @@ function App() {
           }
           // removes the result's date if it exists in the result
           function removeDateInString(inputString){
-            console.log('hello from removedateinstring')
             const regex = /^\d{4}[\/\-](0?[1-9]|1[012])[\/\-]\d{2}/g;
             const outputString = inputString.replaceAll(regex, '');
             return outputString;
@@ -138,7 +144,6 @@ function App() {
           // extract sentence by estimating the start and end markers
           function extractSentence(sentence){
             let hitIndex = sentence.indexOf(searchString);
-            console.log(sentence);
             function findIndexMarker(string, markers, hitIndex, start=true, punctuation=false){
               // to find the start of the sentence, find the latest marker before hitIndex
               if(start){
@@ -167,7 +172,12 @@ function App() {
             let endIndexPunc = findIndexMarker(sentence, endMarkersPunc, hitIndex, false, true);
 
             endIndex = (endIndexPunc < endIndex) ? endIndexPunc : endIndex;
-            return sentence.slice(startIndex, endIndex);
+            return {
+              text: sentence.slice(startIndex, endIndex), 
+              start: sentence.slice(startIndex, hitIndex),
+              searchedPhrase: searchString,
+              end: sentence.slice(hitIndex + searchString.length, endIndex)
+            };
           }
           let outputArray = [];
           // Add text and link property from our results
@@ -185,13 +195,24 @@ function App() {
               outputArray = [...outputArray, {text: null}]
               return;
             }              
-            // Add code to find start and end of sentences
+            // Remove post date in sentence and extract sentence
             sentenceString = removeDateInString(sentenceString);
-            sentenceString = extractSentence(sentenceString);
+            let extractedObject = extractSentence(sentenceString);
 
-            outputArray = [...outputArray, {text: sentenceString, link: resultObj.link}];
+            // once w ehaver our sentence, we can split into 3 parts, phrase 1, bold keyword, phrase 2
+            const fullSentence = extractedObject.text
+            const start = extractedObject.start;
+            const searchedPhrase = extractedObject.searchedPhrase;
+            const end = extractedObject.end;
+
+            outputArray = [...outputArray, {
+              text: fullSentence, 
+              start: start, 
+              searchedPhrase: searchedPhrase, 
+              end: end, 
+              link: resultObj.link
+            }];
           });
-          
           console.log(outputArray);          
           return outputArray;
         }

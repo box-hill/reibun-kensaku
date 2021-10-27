@@ -40,9 +40,8 @@ function Card(props) {
                     if(result.text !== null){
                         return (
                         <div key={index} className='card'>
-                            <div className='card-text'>{result.text}</div>
+                            <div className='card-text'>{result.start}<b>{result.searchedPhrase}</b>{result.end}</div>
                             <a href={result.link} target="_blank" className="icon"><FontAwesomeIcon icon={faLink}/> </a>
-                            <div>I am {<span id='test'>Bold</span>}</div>
                         </div>)
                     }
                 })}
