@@ -69,12 +69,26 @@ function App() {
         console.log('query', querySnapshot);
         let historyArray = [];
         querySnapshot.forEach((doc) => {
-          console.log(doc.data());
-          historyArray.push(doc.data());
-          //setHistory(prevData => [...prevData, doc.data().text]);
+          const obj = doc.data();
+          historyArray.push({id:doc.id, ...obj});
         })
         setHistory(historyArray);
         console.log(historyArray);
+
+        // remove history that exceeds 20
+        const maxHistoryLength = 15;
+        let idsToRemove = [];
+        console.log('historyArray.length is ', historyArray.length);
+        if(historyArray.length > maxHistoryLength) {
+          for(let i=maxHistoryLength; i<historyArray.length; i++){
+            console.log(historyArray);
+            idsToRemove.push(historyArray[i].id);
+          }
+          console.log('ids to remove: ', idsToRemove)
+          idsToRemove.forEach((id) => {
+            docRef.doc(id).delete();
+          })
+        }
       })
       .catch((error => {
         console.log("Error getting documents: ", error);
@@ -128,6 +142,16 @@ function App() {
     })
     .then((response) => {
       console.log('search response: ', response);
+      if(response.error) {
+        setLoadingSearch(false);
+        setParsedResults('API key limit reached');
+        return;
+      }
+      if(response.items === undefined) {
+        setLoadingSearch(false);
+        setParsedResults(undefined);
+        return;
+      }
       // The results with <b> tags contain the search term
       // If neither the htmlSnippet or htmlTitle contains this, then the hit is likely a bad one
       function parseResults(resultsObj) {
@@ -245,19 +269,13 @@ function App() {
         .catch((error) => {
             console.error("Error addin doc: ", error);
         })        
-        // ADD: code that adds directly to history state in local (?)
-        
-        /* ADD: code to delete once no. searches get past 10*/
-
         retrieveHistory();
       }
+      // // ADD: code that adds directly to history state in local (?)
     })
     .catch((error) => {
         console.log(error);
-    });
-    
- 
-     
+    });     
   }
 
   function handleChange(e) {

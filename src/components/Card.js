@@ -28,6 +28,14 @@ function Card(props) {
         </div>
       );
     }
+    if(props.parsedResults === 'API key limit reached') {
+        return (
+            <div id='error-center' className='results-container'>
+              <div className='error-emoji'>(╯°□°)╯︵ ┻━┻</div>
+              <div>API Key limit Reached.</div>
+            </div>
+          );
+    }
     if(props.parsedResults.length === 0){
         return (
             <div className='results-container'>Welcome to my website!</div>
