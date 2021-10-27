@@ -196,11 +196,14 @@ a {
   grid-column: 1;
   grid-row: 1;
   border-right: 1px var(--border-color) solid;
+  font-size: 14px;
+  padding: 6px
 }
 
 .history-item {
   margin: 5px;
 }
+
 #test{font-weight: 900;}
 .icon {
   font-size: 20px;
