@@ -2,7 +2,7 @@ import Loader from './Loader';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLink } from '@fortawesome/free-solid-svg-icons';
 
-function Card(props) {
+function Results(props) {
     const exampleList = [
         {search: 'どうして海', explaination: 'Common multi-word phrases: '},
         {search: '美味しくなくない', explaination: 'Japanese slang: '},
@@ -78,4 +78,4 @@ function Card(props) {
     }
 }
 
-export default Card;
+export default Results;

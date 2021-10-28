@@ -1,7 +1,7 @@
 
 import './App.css';
 import Loader from './components/Loader';
-import Card from './components/Card';
+import Results from './components/Results';
 
 import firebase from "./firebase";
 import 'firebase/compat/firestore';
@@ -9,7 +9,7 @@ import 'firebase/compat/auth';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
-import { faQuestionCircle, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 import React, { useState, useEffect } from 'react';
 
@@ -338,12 +338,13 @@ function App() {
         </div>
         <div className="nav-items">
           {loggedIn ? <NavItem text="Sign out" icon={faGoogle} onClick={logUserOut}></NavItem> : <NavItem text="Sign in" icon={faGoogle} onClick={googleLogin}></NavItem>}
-          <NavItem text="About" icon={faQuestionCircle}></NavItem>
         </div>
       </Navbar>
-      <div className='main-content'>
-        <Card parsedResults={parsedResults} loading={loadingSearch} search={search}/>
-        <History loading={loadingHistory} loggedIn={loggedIn} history={history}/>
+      <div className='flex-center'>
+        <div className='main-content'>
+          <Results parsedResults={parsedResults} loading={loadingSearch} search={search}/>
+          <History loading={loadingHistory} loggedIn={loggedIn} history={history}/>
+        </div>
       </div>
     </div>
   );
@@ -418,8 +419,8 @@ function Navbar(props) {
 function NavItem(props) {
   return (
     <li className="nav-item">
-      <button herf="#" className="text-button" onClick={props.onClick}>
-      <FontAwesomeIcon icon={props.icon}/> {props.text}
+      <button herf="#" className="nav-button" onClick={props.onClick}>
+        <div className="text-button"><FontAwesomeIcon icon={props.icon}/>{props.text}</div>
       </button>
     </li>
   );
