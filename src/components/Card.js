@@ -3,6 +3,22 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLink } from '@fortawesome/free-solid-svg-icons';
 
 function Card(props) {
+    const exampleList = [
+        {search: 'どうして海', explaination: 'Common multi-word phrases: '},
+        {search: '美味しくなくない', explaination: 'Japanese slang: '},
+        {search: 'ほんまに分からん', explaination: 'Dialect: '},
+        {search: '処方せんなしで買え', explaination: 'Incomplete verb conjugation: '},
+        {search: 'Facebook社が開発した', explaination: 'Japanese with English: '},
+    ]
+    function ExampleList(props){
+        return (<ul>
+            {props.examples.map((example, index) => {
+                return (
+                    <li key={index}><span>{example.explaination}</span><span className="example" onClick={() => props.search(example.search)}>{example.search}</span></li>
+                );
+            })}
+        </ul>);
+    }
     if(props.loading === true) {
         return (
         <div className='results-container'>
@@ -36,12 +52,10 @@ function Card(props) {
             <article>
                 <div id="welcome-message">例文検索へようこそ！</div>
                 <p>RK is a powerful Japanese sentence searcher. Unlike other traditional websites that use a dictionary API or database search, <b>RK generates sentences from the web</b>.</p>
-                <p>Yes! This means that blogs, newspaper articles or your favourite celebrity's tweet all contribute to the example sentences generated. 
+                <p>Yes! This means that articles, blogs and even your favourite celebrity's tweet all contribute to the example sentences generated. 
                     RK's biggest strength lies in its ability to <b> generate sentences from open ended phrases</b>, a feature not present in other sentence searchers.</p>
                 <p>Here's a few example searches to give you a taste of what RK can do.</p>
-                <ul>
-                    <li>Example 1</li>
-                </ul>
+                <ExampleList search={props.search} examples={exampleList}/>
             </article>
             </div>
         );

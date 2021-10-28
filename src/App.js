@@ -22,7 +22,7 @@ function App() {
   const [justSearched, setJustSearched] = useState(false);
 
   const [parsedResults, setParsedResults] = useState([]);
-  const [history, setHistory] = useState([{text: 'test-text', numResultsFormatted: 'test num'}]);
+  const [history, setHistory] = useState([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
 
@@ -94,8 +94,9 @@ function App() {
     else {
       let localHistory = localStorage.getItem('pastSearches');
       localHistory = JSON.parse(localHistory);
-      console.log('localHistoryas dad is: ', localHistory);
+      
       if(localHistory === null || localHistory === undefined || localHistory[0] === null) return;
+      console.log('localHistoryas dad is: ', localHistory);
       setHistory(localHistory);
     }
     console.log('Retrieved History: ', history);
@@ -116,21 +117,19 @@ function App() {
     auth.signOut();
     // refresh history, using history in local storage
     retrieveHistory();
-    // let localHistory = localStorage.getItem('pastSearches');
-    // localHistory = JSON.parse(localHistory);
-    // setHistory(localHistory);
   }
 
   function search(e) {
-    e.preventDefault();
-
-    // exit search if search input does not have a single valid Japanese character, 
-    const regex = /[\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]/
-    if(searchInput.match(regex)===null){
-      alert('Search does not contain any Japanese!');
-      return;
+    if(typeof e !== 'string'){
+      e.preventDefault();
+      // exit search if search input does not have a single valid Japanese character, 
+      const regex = /[\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]/
+      if(searchInput.match(regex)===null){
+        alert('Search does not contain any Japanese!');
+        return;
+      }
     }
-
+    
     // only allow one search a second
     if(justSearched) return; 
     setJustSearched(true);
@@ -139,8 +138,14 @@ function App() {
     setParsedResults([]); // erase previous results
     setLoadingSearch(true); // mount loader
 
-    let searchString = searchInput.replace(/\s/g, ''); // remove all spaces from user's search
-    console.log('search is: ', searchString);
+    let searchString = '';
+    if(typeof e === 'string'){
+      searchString = e;
+    }
+    else{
+      searchString = searchInput.replace(/\s/g, ''); // remove all spaces from user's search
+      console.log('search is: ', searchString);
+    }
     let formattedNumberResults = 0;
     let url = `https://www.googleapis.com/customsearch/v1?key=${REACT_APP_GOOGLE_API}&lr=lang_ja&cx=22519e5637b61b1c8&q=\"${searchString}"`;
     fetch(url, {mode: 'cors'})
@@ -165,7 +170,7 @@ function App() {
       function parseResults(resultsObj) {
         // replace all <b>...</b> tags with the keyword searched, &nbsp HTML entities; 
         function replaceTagInString(inputString){
-          const regexTag = new RegExp("<b>.*</b>", "g");
+          const regexTag = new RegExp(`<b>.*</b>`, 'g');
           const regexHTML = new RegExp("&nbsp;", "g");
           let outputString = inputString.replaceAll(regexTag, searchString);
           outputString = outputString.replaceAll(regexHTML, "…");         
@@ -286,26 +291,30 @@ function App() {
       // read, update and save to local storage
       else {
         let justSearched = {text: searchString, numResultsFormatted: formattedNumberResults};
-        console.log('just searched', justSearched);
         let retrievedSearches = localStorage.getItem('pastSearches');
         if(retrievedSearches === null){
-          retrievedSearches = justSearched;
+          console.log('eneterd null');
+          retrievedSearches = [justSearched];
         }
         else {
           retrievedSearches = JSON.parse(retrievedSearches);
-          if(retrievedSearches.length === undefined){
+          if(!(retrievedSearches instanceof Array)){
             retrievedSearches = [retrievedSearches, justSearched];
           }
           else {
-            retrievedSearches = [...retrievedSearches, justSearched];
-            if(retrievedSearches.length > 15){
-              for(let i=15; i++; i<retrievedSearches.length){
+            retrievedSearches = [justSearched, ...retrievedSearches];
+            let historyLen = retrievedSearches.length;
+            if(historyLen > 15){
+              console.log(historyLen, ' --- historyLen')
+              for(let i=15; i<historyLen; i++){
                 retrievedSearches.pop();
+                console.log('pop')
               }
             }
           }
         }
         retrievedSearches = objToArray(retrievedSearches);
+        console.log(retrievedSearches, 'this is my retrievedearches after obj to array')
         console.log('localStorage searches: ', retrievedSearches);
         setHistory(retrievedSearches);
         console.log(history);
@@ -333,7 +342,7 @@ function App() {
         </div>
       </Navbar>
       <div className='main-content'>
-        <Card parsedResults={parsedResults} loading={loadingSearch}/>
+        <Card parsedResults={parsedResults} loading={loadingSearch} search={search}/>
         <History loading={loadingHistory} loggedIn={loggedIn} history={history}/>
       </div>
     </div>
@@ -344,7 +353,7 @@ function objToArray(obj) {
   if(obj instanceof Array || obj === null) {
     return obj;
   }
-  return [obj.records];
+  return [obj];
 }
 
 function History(props) {
@@ -361,21 +370,22 @@ function History(props) {
   if(props.history === null || props.history === undefined){
     return  (
       <div className='history'>
-        <div>Recent searches</div>
+        <div>Try searching something!</div>
       </div>
     );
   }
   if(props.history[0] === null || props.history[0] === undefined){
     return  (
       <div className='history'>
-        <div>Recent searches</div>
+        <div>Try searching something!</div>
       </div>
     );
   }
   if(props.history.length === 0) {
     return  (
       <div className='history'>
-        <div>Recent searches</div>
+        <div className='history-heading'>Recent searches</div>
+        <div className='history-table'></div>
       </div>
     );
   }
@@ -387,7 +397,7 @@ function History(props) {
           {props.history.map((item, index) => {
             return (<div key={index} className='history-item' id={'past-search-'+index}>
               <div>{item.text}</div>
-              <div className="num-results">{item.numResultsFormatted}</div>
+              <div className="num-results">{item.numResultsFormatted} Matches</div>
             </div>);
           })}
         </div>
@@ -418,7 +428,7 @@ function NavItem(props) {
 function NavSearchBar(props) {
   return (
     <form autoComplete="off">
-    <input type="text" maxLength="15" placeholder="Search a phrase..." autofocus required
+    <input type="text" maxLength="15" placeholder="Search a phrase..." required
     autoComplete="false" className="nav-search-bar" id="focus"
     onChange={props.handleChange}>
     </input>

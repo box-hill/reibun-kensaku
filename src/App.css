@@ -18,16 +18,18 @@ body, #root {
   margin: 0;
 }
 
-ul { 
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
 a {
-  /* color: var(--text-color); */
   text-decoration: none;
   color: black;
+}
+
+.example {
+  color: #1f65ac;
+  text-decoration: underline;
+}
+
+.example:hover{
+  color: rgb(0, 22, 43);
 }
 
 .navbar {
@@ -41,6 +43,9 @@ a {
 }
 
 .navbar-nav {
+  margin: 0;
+  padding: 0;
+  list-style: none;
   max-width: 100%;
   height:100%;
   display: flex;
@@ -69,7 +74,7 @@ a {
 
 .nav-search-bar {
   height: calc(var(--nav-size)*0.6);
-  width: 150px;
+  width: 190px;
   font-size: 17px;
   color: rgb(189, 189, 189);
   background-color: var(--bg-nav);
@@ -245,6 +250,7 @@ article {
   font-size: 20px;
   font-weight: 600;
 }
+
 
 .main-content {
   height: 100%;
