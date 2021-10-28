@@ -39,7 +39,8 @@ function App() {
 
   useEffect(() => {
     checkUser();
-    //retrieveHistory();
+    const searchBar = document.getElementById('focus');
+    searchBar.focus();
   }, [])
 
   useEffect(() => {
@@ -141,7 +142,7 @@ function App() {
     let searchString = searchInput.replace(/\s/g, ''); // remove all spaces from user's search
     console.log('search is: ', searchString);
     let formattedNumberResults = 0;
-    let url = `https://www.googleapis.com/customsearch/v1?key=${REACT_APP_GOOGLE_API}&cx=22519e5637b61b1c8&q=\"${searchString}"`;
+    let url = `https://www.googleapis.com/customsearch/v1?key=${REACT_APP_GOOGLE_API}&lr=lang_ja&cx=22519e5637b61b1c8&q=\"${searchString}"`;
     fetch(url, {mode: 'cors'})
     .then((response) => {
         return response.json();
@@ -417,11 +418,11 @@ function NavItem(props) {
 function NavSearchBar(props) {
   return (
     <form autoComplete="off">
-    <input type="text" maxLength="15" placeholder="Type some japanese here" 
-    autoComplete="false" className="nav-search-bar" 
+    <input type="text" maxLength="15" placeholder="Search a phrase..." autofocus required
+    autoComplete="false" className="nav-search-bar" id="focus"
     onChange={props.handleChange}>
     </input>
-    <button className="nav-search-bar-button" onClick={props.search}><FontAwesomeIcon icon={faSearch}/>Search</button>
+    <button className="nav-search-bar-button" onClick={props.search}><FontAwesomeIcon icon={faSearch}/></button>
     </form>
   );
 }
