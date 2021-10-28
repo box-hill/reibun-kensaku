@@ -3,12 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLink } from '@fortawesome/free-solid-svg-icons';
 
 function Card(props) {
-
-    
-    function retrieveSentenceInString(string){
-        // retrieve the sentence from the String.
-    }
-
     if(props.loading === true) {
         return (
         <div className='results-container'>

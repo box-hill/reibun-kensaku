@@ -164,7 +164,8 @@ a {
 .main-content {
   height: 100%;
   display: grid;
-  grid-template-columns: 300px 1fr 200px;
+  grid-template-columns: 300px 1fr;
+  /* grid-template-columns:  */
 }
 
 .card {
@@ -196,12 +197,23 @@ a {
   grid-column: 1;
   grid-row: 1;
   border-right: 1px var(--border-color) solid;
-  font-size: 14px;
+  font-size: 15px;
   padding: 6px
+}
+.history-heading {
+  font-size: 17px;
+}
+
+.num-results {
+  font-size: 13px;
 }
 
 .history-item {
-  margin: 5px;
+  margin: 5px 5px 8px;
+}
+
+#past-search-0{
+  font-weight: 600;
 }
 
 #test{font-weight: 900;}

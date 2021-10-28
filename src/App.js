@@ -5,7 +5,6 @@ import Card from './components/Card';
 
 import firebase from "./firebase";
 import 'firebase/compat/firestore';
-import { query, orderBy, limit } from "firebase/firestore";  
 import 'firebase/compat/auth';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,9 +17,8 @@ const { REACT_APP_GOOGLE_API } = process.env;
 
 function App() {
 
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(undefined);
   const [searchInput, setSearchInput] = useState('');
-  const [numberResults, setNumberResults] = useState(undefined);
   const [justSearched, setJustSearched] = useState(false);
 
   const [parsedResults, setParsedResults] = useState([]);
@@ -33,17 +31,15 @@ function App() {
     firebase.auth().onAuthStateChanged(function(user) {
         if(user){
             setLoggedIn(true);
-            console.log('user is logged in ');
         } else { 
             setLoggedIn(false);
-            console.log('not signed in');
         }
     })
   }
 
   useEffect(() => {
     checkUser();
-    retrieveHistory();
+    //retrieveHistory();
   }, [])
 
   useEffect(() => {
@@ -55,7 +51,7 @@ function App() {
   }, [history])
 
   function retrieveHistory(){
-    // check if user is logged in, and then retrieve History
+    // check if user is logged in, and then retrieve History, setHistory, and also remove old searches
     if(loggedIn){
       setLoadingHistory(true);
       const user = firebase.auth().currentUser;
@@ -75,7 +71,7 @@ function App() {
         setHistory(historyArray);
         console.log(historyArray);
 
-        // remove history that exceeds 20
+        // remove history that exceeds 15
         const maxHistoryLength = 15;
         let idsToRemove = [];
         console.log('historyArray.length is ', historyArray.length);
@@ -93,10 +89,13 @@ function App() {
       .catch((error => {
         console.log("Error getting documents: ", error);
       }))
-      console.log('Retrieved History: ', history);
-      
-
     }
+    else {
+      let localHistory = localStorage.getItem('pastSearches');
+      localHistory = JSON.parse(localHistory);
+      setHistory(localHistory);
+    }
+    console.log('Retrieved History: ', history);
   }
 
   function googleLogin() {
@@ -112,6 +111,10 @@ function App() {
   function logUserOut(){
     const auth = firebase.auth();    
     auth.signOut();
+    // use the browser's local history if user is not signed in
+    let localHistory = localStorage.getItem('pastSearches');
+    localHistory = JSON.parse(localHistory);
+    setHistory(localHistory);
   }
 
   function search(e) {
@@ -147,6 +150,7 @@ function App() {
         setParsedResults('API key limit reached');
         return;
       }
+      // no results found:
       if(response.items === undefined) {
         setLoadingSearch(false);
         setParsedResults(undefined);
@@ -193,7 +197,7 @@ function App() {
           }
           let startMarkers = [".", ";", "。", "…", "？", "?", "|","｜","！","!","→"];
           let endMarkers = [";","|","｜","→","【", "&"];
-          let endMarkersPunc= [".", , "。", "…", "？", "?","！","!"];
+          let endMarkersPunc= [".", "。", "…", "？", "?","！","!"];
 
           let startIndex = findIndexMarker(sentence, startMarkers, hitIndex, true);
           let endIndex = findIndexMarker(sentence, endMarkers, hitIndex, false);
@@ -227,7 +231,6 @@ function App() {
           sentenceString = removeDateInString(sentenceString);
           let extractedObject = extractSentence(sentenceString);
 
-          // once w ehaver our sentence, we can split into 3 parts, phrase 1, bold keyword, phrase 2
           const fullSentence = extractedObject.text
           const start = extractedObject.start;
           const searchedPhrase = extractedObject.searchedPhrase;
@@ -247,7 +250,6 @@ function App() {
       setParsedResults(parseResults(response.items));
 
       formattedNumberResults = response.searchInformation.formattedTotalResults
-      setNumberResults(formattedNumberResults);
       console.log(response.items);
       setLoadingSearch(false);
 
@@ -271,7 +273,33 @@ function App() {
         })        
         retrieveHistory();
       }
-      // // ADD: code that adds directly to history state in local (?)
+      // read, update and save to local storage
+      else {
+        let justSearched = {text: searchString, numResultsFormatted: formattedNumberResults};
+        console.log('just searched', justSearched);
+        let retrievedSearches = localStorage.getItem('pastSearches');
+        if(!retrievedSearches){
+          retrievedSearches = justSearched;
+        }
+        else {
+          retrievedSearches = JSON.parse(retrievedSearches);
+          if(retrievedSearches.length === undefined){
+            retrievedSearches = [retrievedSearches, justSearched];
+          }
+          else {
+            retrievedSearches = [...retrievedSearches, justSearched];
+            if(retrievedSearches.length > 15){
+              for(let i=15; i++; i<retrievedSearches.length){
+                retrievedSearches.pop();
+              }
+            }
+          }
+        }
+        console.log('localStorage searches: ', retrievedSearches);
+        setHistory(retrievedSearches);
+        console.log(history);
+        localStorage.setItem('pastSearches', JSON.stringify(retrievedSearches));
+      }     
     })
     .catch((error) => {
         console.log(error);
@@ -296,20 +324,12 @@ function App() {
       <div className='main-content'>
         <Card parsedResults={parsedResults} loading={loadingSearch}/>
         <History loading={loadingHistory} loggedIn={loggedIn} history={history}/>
-        <NumberResults numberResults={numberResults}/>
       </div>
     </div>
   );
 }
 
 function History(props) {
-  if(!props.loggedIn){
-    return (
-      <div className='history'>
-        Log to view hist
-      </div>
-    )
-  }
   if(props.loading){
     return (
       <div className='history'>
@@ -319,26 +339,27 @@ function History(props) {
       </div>
     );
   }
+  if(props.history.length === 0){
+    return  (
+      <div className='history'>
+        <div>Recent searches</div>
+      </div>
+    );
+  }
   if(props.history.length !== 0){
     return (
       <div className='history'>
-        <div>Recent searches</div>
+        <div className='history-heading'>Recent searches</div>
         {props.history.map((item, index) => {
-          return (<div key={index} className='history-item'>
+          return (<div key={index} className='history-item' id={'past-search-'+index}>
             <div>{item.text}</div>
-            <div>{item.numResultsFormatted}</div>
+            <div className="num-results">{item.numResultsFormatted}</div>
           </div>);
         })}
       </div>
     );
   }
   return null;
-}
-
-function NumberResults(props) {
-  console.log(props.numberResults);
-  if(props.numberResults === undefined) return null;
-  return (<div>About {props.numberResults} matching sentences</div>);
 }
 
 function Navbar(props) {
