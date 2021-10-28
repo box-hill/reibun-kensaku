@@ -32,7 +32,18 @@ function Card(props) {
     }
     if(props.parsedResults.length === 0){
         return (
-            <div className='results-container'>Welcome to my website!</div>
+            <div className='results-container' id="welcome-container">
+            <article>
+                <div id="welcome-message">例文検索へようこそ！</div>
+                <p>RK is a powerful Japanese sentence searcher. Unlike other traditional websites that use a dictionary API or database search, <b>RK generates sentences from the web</b>.</p>
+                <p>Yes! This means that blogs, newspaper articles or your favourite celebrity's tweet all contribute to the example sentences generated. 
+                    RK's biggest strength lies in its ability to <b> generate sentences from open ended phrases</b>, a feature not present in other sentence searchers.</p>
+                <p>Here's a few example searches to give you a taste of what RK can do.</p>
+                <ul>
+                    <li>Example 1</li>
+                </ul>
+            </article>
+            </div>
         );
     }
     else {

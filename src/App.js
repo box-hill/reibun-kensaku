@@ -22,7 +22,7 @@ function App() {
   const [justSearched, setJustSearched] = useState(false);
 
   const [parsedResults, setParsedResults] = useState([]);
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState([{text: 'test-text', numResultsFormatted: 'test num'}]);
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
 
@@ -93,6 +93,8 @@ function App() {
     else {
       let localHistory = localStorage.getItem('pastSearches');
       localHistory = JSON.parse(localHistory);
+      console.log('localHistoryas dad is: ', localHistory);
+      if(localHistory === null || localHistory === undefined || localHistory[0] === null) return;
       setHistory(localHistory);
     }
     console.log('Retrieved History: ', history);
@@ -111,10 +113,11 @@ function App() {
   function logUserOut(){
     const auth = firebase.auth();    
     auth.signOut();
-    // use the browser's local history if user is not signed in
-    let localHistory = localStorage.getItem('pastSearches');
-    localHistory = JSON.parse(localHistory);
-    setHistory(localHistory);
+    // refresh history, using history in local storage
+    retrieveHistory();
+    // let localHistory = localStorage.getItem('pastSearches');
+    // localHistory = JSON.parse(localHistory);
+    // setHistory(localHistory);
   }
 
   function search(e) {
@@ -167,10 +170,15 @@ function App() {
           outputString = outputString.replaceAll(regexHTML, "…");         
           return outputString;
         }
-        // removes the result's date if it exists in the result
         function removeDateInString(inputString){
+          // removes the result's date if it exists in the result
           const regex = /^\d{4}[\/\-](0?[1-9]|1[012])[\/\-]\d{2}/g;
           const outputString = inputString.replaceAll(regex, '');
+          return outputString;
+        }
+        function removeHTMLtagsInString(inputString){
+          const regex = /(<([^>]+)>)/ig;
+          const outputString = inputString.replaceAll(regex, '')
           return outputString;
         }
         // extract sentence by estimating the start and end markers
@@ -229,6 +237,7 @@ function App() {
           }              
           // Remove post date in sentence and extract sentence
           sentenceString = removeDateInString(sentenceString);
+          sentenceString = removeHTMLtagsInString(sentenceString);
           let extractedObject = extractSentence(sentenceString);
 
           const fullSentence = extractedObject.text
@@ -278,7 +287,7 @@ function App() {
         let justSearched = {text: searchString, numResultsFormatted: formattedNumberResults};
         console.log('just searched', justSearched);
         let retrievedSearches = localStorage.getItem('pastSearches');
-        if(!retrievedSearches){
+        if(retrievedSearches === null){
           retrievedSearches = justSearched;
         }
         else {
@@ -295,6 +304,7 @@ function App() {
             }
           }
         }
+        retrievedSearches = objToArray(retrievedSearches);
         console.log('localStorage searches: ', retrievedSearches);
         setHistory(retrievedSearches);
         console.log(history);
@@ -329,7 +339,15 @@ function App() {
   );
 }
 
+function objToArray(obj) {
+  if(obj instanceof Array || obj === null) {
+    return obj;
+  }
+  return [obj.records];
+}
+
 function History(props) {
+  console.log(props.history);
   if(props.loading){
     return (
       <div className='history'>
@@ -339,7 +357,21 @@ function History(props) {
       </div>
     );
   }
-  if(props.history.length === 0){
+  if(props.history === null || props.history === undefined){
+    return  (
+      <div className='history'>
+        <div>Recent searches</div>
+      </div>
+    );
+  }
+  if(props.history[0] === null || props.history[0] === undefined){
+    return  (
+      <div className='history'>
+        <div>Recent searches</div>
+      </div>
+    );
+  }
+  if(props.history.length === 0) {
     return  (
       <div className='history'>
         <div>Recent searches</div>
@@ -350,12 +382,14 @@ function History(props) {
     return (
       <div className='history'>
         <div className='history-heading'>Recent searches</div>
-        {props.history.map((item, index) => {
-          return (<div key={index} className='history-item' id={'past-search-'+index}>
-            <div>{item.text}</div>
-            <div className="num-results">{item.numResultsFormatted}</div>
-          </div>);
-        })}
+        <div className='history-table'>
+          {props.history.map((item, index) => {
+            return (<div key={index} className='history-item' id={'past-search-'+index}>
+              <div>{item.text}</div>
+              <div className="num-results">{item.numResultsFormatted}</div>
+            </div>);
+          })}
+        </div>
       </div>
     );
   }
