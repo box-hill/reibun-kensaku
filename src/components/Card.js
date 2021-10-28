@@ -6,9 +6,10 @@ function Card(props) {
     const exampleList = [
         {search: 'どうして海', explaination: 'Common multi-word phrases: '},
         {search: '美味しくなくない', explaination: 'Japanese slang: '},
-        {search: 'ほんまに分からん', explaination: 'Dialect: '},
+        {search: 'ほんまに分からん', explaination: 'Dialect and slang: '},
         {search: '処方せんなしで買え', explaination: 'Incomplete verb conjugation: '},
-        {search: 'Facebook社が開発した', explaination: 'Japanese with English: '},
+        {search: 'グラスの数が足りない', explaination: 'Check for correct sentences: '},
+        {search: 'ガラスの数が足りない', explaination: 'Incorrect searches yield no results: '},
     ]
     function ExampleList(props){
         return (<ul>
@@ -55,7 +56,7 @@ function Card(props) {
                 <p>Yes! This means that articles, blogs and even your favourite celebrity's tweet all contribute to the example sentences generated. 
                     RK's biggest strength lies in its ability to <b> generate sentences from open ended phrases</b>, a feature not present in other sentence searchers.</p>
                 <p>Here's a few example searches to give you a taste of what RK can do.</p>
-                <ExampleList search={props.search} examples={exampleList}/>
+                <ExampleList  search={props.search} examples={exampleList}/>
             </article>
             </div>
         );
