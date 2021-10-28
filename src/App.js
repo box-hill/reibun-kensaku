@@ -183,8 +183,10 @@ function App() {
           return outputString;
         }
         function removeHTMLtagsInString(inputString){
-          const regex = /(<([^>]+)>)/ig;
-          const outputString = inputString.replaceAll(regex, '')
+          let regex = /(<([^>]+)>)/ig;
+          let outputString = inputString.replaceAll(regex, '');
+          regex = /&.*;/g;
+          outputString = outputString.replaceAll(regex, '');
           return outputString;
         }
         // extract sentence by estimating the start and end markers
@@ -268,57 +270,62 @@ function App() {
       console.log(response.items);
       setLoadingSearch(false);
 
-      // check if user is logged in, and then write to firestore to save user's search
-      if(loggedIn) {
-        const user = firebase.auth().currentUser;
-        const uniqueId = user.uid;
+      saveHistory(searchString, formattedNumberResults);
 
-        const date = new Date();
-        const time = date.getTime();
-        
-        const db = firebase.firestore(); // initialise your database
-        console.log('num of res from ', formattedNumberResults);
-        db.collection('users').doc(uniqueId).collection('searches').add({
-            text: searchString,
-            searchedOn: time,
-            numResultsFormatted: formattedNumberResults,
-        })
-        .catch((error) => {
-            console.error("Error addin doc: ", error);
-        })        
-        retrieveHistory();
-      }
-      // read, update and save to local storage
-      else {
-        let justSearched = {text: searchString, numResultsFormatted: formattedNumberResults};
-        let retrievedSearches = localStorage.getItem('pastSearches');
-        if(retrievedSearches === null){
-          console.log('eneterd null');
-          retrievedSearches = [justSearched];
+      // save history to cloud/localStorage and setState
+      function saveHistory(string, numResults){
+        // check if user is logged in, and then write to firestore to save user's search
+        if(loggedIn) {
+          const user = firebase.auth().currentUser;
+          const uniqueId = user.uid;
+
+          const date = new Date();
+          const time = date.getTime();
+          
+          const db = firebase.firestore(); // initialise your database
+          console.log('num of res from ', numResults);
+          db.collection('users').doc(uniqueId).collection('searches').add({
+              text: string,
+              searchedOn: time,
+              numResultsFormatted: numResults,
+          })
+          .catch((error) => {
+              console.error("Error addin doc: ", error);
+          })        
+          retrieveHistory();
         }
+        // read, update and save to local storage
         else {
-          retrievedSearches = JSON.parse(retrievedSearches);
-          if(!(retrievedSearches instanceof Array)){
-            retrievedSearches = [retrievedSearches, justSearched];
+          let justSearched = {text: string, numResultsFormatted: numResults};
+          let retrievedSearches = localStorage.getItem('pastSearches');
+          if(retrievedSearches === null){
+            console.log('eneterd null');
+            retrievedSearches = [justSearched];
           }
           else {
-            retrievedSearches = [justSearched, ...retrievedSearches];
-            let historyLen = retrievedSearches.length;
-            if(historyLen > 15){
-              console.log(historyLen, ' --- historyLen')
-              for(let i=15; i<historyLen; i++){
-                retrievedSearches.pop();
-                console.log('pop')
+            retrievedSearches = JSON.parse(retrievedSearches);
+            if(!(retrievedSearches instanceof Array)){
+              retrievedSearches = [retrievedSearches, justSearched];
+            }
+            else {
+              retrievedSearches = [justSearched, ...retrievedSearches];
+              let historyLen = retrievedSearches.length;
+              if(historyLen > 15){
+                console.log(historyLen, ' --- historyLen')
+                for(let i=15; i<historyLen; i++){
+                  retrievedSearches.pop();
+                  console.log('pop')
+                }
               }
             }
           }
+          retrievedSearches = objToArray(retrievedSearches);
+          console.log(retrievedSearches, 'this is my retrievedearches after obj to array')
+          console.log('localStorage searches: ', retrievedSearches);
+          setHistory(retrievedSearches);
+          console.log(history);
+          localStorage.setItem('pastSearches', JSON.stringify(retrievedSearches));
         }
-        retrievedSearches = objToArray(retrievedSearches);
-        console.log(retrievedSearches, 'this is my retrievedearches after obj to array')
-        console.log('localStorage searches: ', retrievedSearches);
-        setHistory(retrievedSearches);
-        console.log(history);
-        localStorage.setItem('pastSearches', JSON.stringify(retrievedSearches));
       }     
     })
     .catch((error) => {
