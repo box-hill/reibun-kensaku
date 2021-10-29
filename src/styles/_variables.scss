@@ -1,0 +1,20 @@
+@mixin flexCenter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+$bg:  #202124;
+$bg-nav:  #24292f;
+$bg-accent: #484a4d;
+$text-color: #dadce1;
+$nav-size: 65px;
+$border-color: #d0d7de;
+$border-radius: 6px;
+$spacing: 20px;
+
+$searchbar-width: 190px;
+$searchbar-width-focus: 270px;
+
+$searchbar-width-small: 130px;
+$searchbar-width-small-focus: 170px;

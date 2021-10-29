@@ -1,0 +1,82 @@
+.navbar {
+    height: $nav-size;
+    width: 100%;
+    background-color: $bg-nav;
+    position: fixed;
+    top: 0;
+    @include flexCenter();
+}
+
+.navbar-nav {
+    margin: 0;
+    padding: 0 $spacing;
+    list-style: none;
+    width: 1250px;
+    height:100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.nav-search {
+    @include flexCenter();
+    flex-wrap: nowrap;
+}
+
+.nav-search-bar-button {
+    height: 0.5 * $nav-size;
+    width: 0.5 * $nav-size;
+    border-radius: 100%;
+    border-style: none;
+    background-color: rgb(224, 224, 224);
+    transition: all 0.5s;
+    &:hover {
+        background-color: rgb(141, 141, 141);
+    }
+}
+
+.nav-search-bar {
+    height: $nav-size * 0.6;
+    width: $searchbar-width;
+    font-size: 17px;
+    color: rgb(189, 189, 189);
+    background-color: $bg-nav;
+    padding-left: 5px;
+    margin: 0 10px 0px 7px;
+    border: $border-color solid 1px;
+    border-radius: $border-radius;
+    transition: width 0.2s ease;
+    &:focus {
+        color: black;
+        background-color: rgb(255, 255, 255);
+        background-clip: padding-box;
+        width: $searchbar-width-focus;
+    }
+    &:valid {
+        width: $searchbar-width-focus;
+    }
+}
+
+.nav-items {
+    display: flex;
+    flex-wrap: nowrap;
+}
+  
+.nav-item {
+    @include flexCenter();
+}
+
+.nav-button {
+    margin: 5px;
+    height: $nav-size * 0.5;
+    font-size: 16px;
+    background: $bg-nav;
+    color: rgb(221, 221, 221);
+    transition: all 0.3s ease;
+    border-style: none;
+    svg {
+        margin-right: 5px;
+    }
+    &:hover .text-button {
+        color: white;
+    }
+}
