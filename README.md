@@ -11,10 +11,10 @@ Popular Japanese sentence seachers (such as yourei.jp) are very good at generati
 Where my website differs, is that it searches the web for example sentences. This means that anyone who writes a blog or tweets something can contribute to sentences generated. This results in stronger matches with context from a myriad of sources.  
 
 Here's how my website compares to other sentence searchers:  
-| Search        | RK       | Jisho | 
-| ---:          | :---:    | :---: | 
-| 美味しくなくない  | ⭕      | ❌      |
-| ほんまに分からん  |  ⭕       | ❌    |
+| Search          |             RK        | Jisho | 
+| ---:            |      :---:            | :---: | 
+| 美味しくなくない  | :heavy_check_mark:   | :x:    |
+| ほんまに分からん  | :heavy_check_mark:   | :x:    |
 ### 💪 Features
  * Example sentences generated from native speakers
  * Not limited to a dictionary API/database query
