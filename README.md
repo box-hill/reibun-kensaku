@@ -8,12 +8,14 @@ My aim with this project was to create a Japanese learning tool for intermediate
   
 Popular Japanese sentence seachers (such as yourei.jp) are very good at generating sentences from one word searches. However, they fail at generating sentences once that word is turned into a phrase.  
   
-Where my website differs, is that it searches from the web for example sentences. This means that anyone who writes a blog or tweets something can contribute to sentences generated. This results in stronger matches with context from a myriad of sources.
+Where my website differs, is that it searches the web for example sentences. This means that anyone who writes a blog or tweets something can contribute to sentences generated. This results in stronger matches with context from a myriad of sources.
 
 ### 💪 Features
+ * Example sentences generated from native speakers
  * Not limited to a dictionary API/database query
  * Save search history to the cloud  
- * Hyperlinks to sources where sentences are generated from  
+ * Hyperlinks to sources where sentences are generated from, allowing a better understanding of the context where the sentence is used  
+ * Doubles as a grammar/meaning checker    
  * Mobile friendly
 
 ### 🛠️ Made with
