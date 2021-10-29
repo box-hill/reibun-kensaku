@@ -1,8 +1,8 @@
 
 import './App.css';
-import Loader from './components/Loader';
-import Results from './components/Results';
 
+import Results from './components/Results';
+import History from './components/History';
 import firebase from "./firebase";
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
@@ -56,13 +56,11 @@ function App() {
     if(loggedIn) {
       const user = firebase.auth().currentUser;
       const uniqueId = user.uid;
-      console.log(uniqueId);
 
       const date = new Date();
       const time = date.getTime();
       
       const db = firebase.firestore(); // initialise your database
-      console.log('num of res from ', numResults);
       db.collection('users').doc(uniqueId).collection('searches').add({
           text: string,
           searchedOn: time,
@@ -78,7 +76,6 @@ function App() {
       let justSearched = {text: string, numResultsFormatted: numResults};
       let retrievedSearches = localStorage.getItem('pastSearches');
       if(retrievedSearches === null){
-        console.log('eneterd null');
         retrievedSearches = [justSearched];
       }
       else {
@@ -90,19 +87,14 @@ function App() {
           retrievedSearches = [justSearched, ...retrievedSearches];
           let historyLen = retrievedSearches.length;
           if(historyLen > 15){
-            console.log(historyLen, ' --- historyLen')
             for(let i=15; i<historyLen; i++){
               retrievedSearches.pop();
-              console.log('pop')
             }
           }
         }
       }
       retrievedSearches = objToArray(retrievedSearches);
-      console.log(retrievedSearches, 'this is my retrievedearches after obj to array')
-      console.log('localStorage searches: ', retrievedSearches);
       setHistory(retrievedSearches);
-      console.log(history);
       localStorage.setItem('pastSearches', JSON.stringify(retrievedSearches));
     }
   }     
@@ -118,7 +110,6 @@ function App() {
 
       docRef.orderBy("searchedOn", "desc").get()
       .then((querySnapshot) => {
-        console.log('query', querySnapshot);
         let historyArray = [];
         querySnapshot.forEach((doc) => {
           const obj = doc.data();
@@ -128,7 +119,6 @@ function App() {
         // remove history that exceeds 15
         const maxHistoryLength = 15;
         let idsToRemove = [];
-        console.log('historyArray.length is ', historyArray.length);
         if(historyArray.length > maxHistoryLength) {
           for(let i=maxHistoryLength; i<historyArray.length; i++){
             console.log(historyArray);
@@ -202,7 +192,6 @@ function App() {
     }
     else{
       searchString = searchInput.replace(/\s/g, ''); // remove all spaces from user's search
-      console.log('search is: ', searchString);
     }
     let formattedNumberResults = 0;
     let url = `https://www.googleapis.com/customsearch/v1?key=${REACT_APP_GOOGLE_API}&lr=lang_ja&cx=22519e5637b61b1c8&q=\"${searchString}"`;
@@ -326,12 +315,9 @@ function App() {
       setParsedResults(parseResults(response.items));
 
       formattedNumberResults = response.searchInformation.formattedTotalResults
-      console.log(response.items);
       setLoadingSearch(false);
 
       saveHistory(searchString, formattedNumberResults);
-
-      
     })
     .catch((error) => {
         console.log(error);
@@ -370,57 +356,6 @@ function objToArray(obj) {
   return [obj];
 }
 
-function History(props) {
-  console.log(props.history);
-  if(props.loading){
-    return (
-      <div className='history'>
-        <div id='loader'>
-          <Loader loading={props.loading}/>
-        </div>
-      </div>
-    );
-  }
-  if(props.history === null || props.history === undefined){
-    return  (
-      <div className='history'>
-        <div>Try searching something!</div>
-      </div>
-    );
-  }
-  // if(props.history[0] === null || props.history[0] === undefined){
-  //   return  (
-  //     <div className='history'>
-  //       <div>Try searching something!</div>
-  //     </div>
-  //   );
-  // }
-  if(props.history.length === 0) {
-    return  (
-      <div className='history'>
-        <div className='history-heading'>Recent searches</div>
-        <div className='history-table'></div>
-      </div>
-    );
-  }
-  if(props.history.length !== 0){
-    return (
-      <div className='history'>
-        <div className='history-heading'>Recent searches</div>
-        <div className='history-table'>
-          {props.history.map((item, index) => {
-            return (<div key={index} className='history-item' id={'past-search-'+index}>
-              <div>{item.text}</div>
-              <div className="num-results">{item.numResultsFormatted} Matches</div>
-            </div>);
-          })}
-        </div>
-      </div>
-    );
-  }
-  return null;
-}
-
 function Navbar(props) {
   return (
     <nav className="navbar">
@@ -430,7 +365,7 @@ function Navbar(props) {
 }
 
 function NavItem(props) {
-  if(!props.initialLogin) return null; // loader here
+  if(!props.initialLogin) return null;
   return (
     <li className="nav-item">
       <button herf="#" className="nav-button" onClick={props.onClick}>
