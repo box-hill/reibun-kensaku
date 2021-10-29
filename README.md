@@ -18,7 +18,10 @@ Where my website differs, is that it searches the web for example sentences. Thi
  * Doubles as a grammar/meaning checker    
  * Mobile friendly
 
+### 🚧 Features to be implemented:
+ * Automatically show Japanese reading and English definition when Japanese words are hovered over.
+
 ### 🛠️ Made with
  * React.js
  * Firebase Hosting, Cloud Storage and Authentication
- * Vanilla CSS
+ * Sass
