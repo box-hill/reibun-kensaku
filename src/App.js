@@ -1,15 +1,15 @@
-
-import './App.css';
+import './styles/App.css'
 
 import Results from './components/Results';
 import History from './components/History';
+import Navbar from './components/Navbar';
+import NavSearchBar from './components/NavSearchBar';
+import NavItem from './components/NavItem';
 import firebase from "./firebase";
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 import React, { useState, useEffect } from 'react';
 
@@ -26,21 +26,6 @@ function App() {
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
  
-  // check if user is logged in
-  function checkUser(){
-    firebase.auth().onAuthStateChanged(function(user) {
-        if(user){
-            setLoggedIn(true);
-            setInitialLoginCheck(true);
-            retrieveHistory();   
-        } else { 
-            setLoggedIn(false);
-            setInitialLoginCheck(true);
-            retrieveHistory();
-        }
-    })
-  }
-
   useEffect(() => {
     checkUser();
     const searchBar = document.getElementById('focus');
@@ -98,7 +83,30 @@ function App() {
       setHistory(retrievedSearches);
       localStorage.setItem('pastSearches', JSON.stringify(retrievedSearches));
     }
-  }     
+  }
+  
+  function objToArray(obj) {
+    if(obj instanceof Array || obj === null) {
+      return obj;
+    }
+    return [obj];
+  }
+
+  // check if user is logged in
+  function checkUser(){
+    firebase.auth().onAuthStateChanged(function(user) {
+        if(user){
+            setLoggedIn(true);
+            setInitialLoginCheck(true);
+            retrieveHistory();   
+        } else { 
+            setLoggedIn(false);
+            setInitialLoginCheck(true);
+            retrieveHistory();
+        }
+    })
+  }
+  
   function retrieveHistory(){
     setLoadingHistory(true);
     // check if user is logged in, and then retrieve History, setHistory, and also remove old searches
@@ -122,10 +130,8 @@ function App() {
         let idsToRemove = [];
         if(historyArray.length > maxHistoryLength) {
           for(let i=maxHistoryLength; i<historyArray.length; i++){
-            console.log(historyArray);
             idsToRemove.push(historyArray[i].id);
           }
-          console.log('ids to remove: ', idsToRemove)
           idsToRemove.forEach((id) => {
             docRef.doc(id).delete();
           })
@@ -154,7 +160,7 @@ function App() {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider)
         .then(result => {
-            console.log('User has Logged In')
+            console.log('Log in with Google Login successful')
         })
         .catch(console.log);
     retrieveHistory();
@@ -349,43 +355,11 @@ function App() {
   );
 }
 
-function objToArray(obj) {
-  if(obj instanceof Array || obj === null) {
-    return obj;
-  }
-  return [obj];
-}
 
-function Navbar(props) {
-  return (
-    <nav className="navbar">
-      <ul className="navbar-nav"> { props.children }</ul>
-    </nav>
-  );
-}
 
-function NavItem(props) {
-  if(!props.initialLogin) return null;
-  return (
-    <li className="nav-item">
-      <button herf="#" className="nav-button" onClick={props.onClick}>
-        <div className="text-button"><FontAwesomeIcon icon={props.icon}/>{props.text}</div>
-      </button>
-    </li>
-  );
-}
 
-function NavSearchBar(props) {
-  return (
-    <form autoComplete="off">
-    <input type="text" maxLength="15" placeholder="Search a phrase..." required
-    autoComplete="false" className="nav-search-bar" id="focus"
-    onChange={props.handleChange}>
-    </input>
-    <button className="nav-search-bar-button" onClick={props.search}><FontAwesomeIcon icon={faSearch}/></button>
-    </form>
-  );
-}
+
+
 
 
 
