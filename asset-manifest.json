@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/reibun-kensaku/static/css/main.59fbe4a5.chunk.css",
+    "main.js": "/reibun-kensaku/static/js/main.b13707f7.chunk.js",
+    "main.js.map": "/reibun-kensaku/static/js/main.b13707f7.chunk.js.map",
+    "runtime-main.js": "/reibun-kensaku/static/js/runtime-main.eb37ddef.js",
+    "runtime-main.js.map": "/reibun-kensaku/static/js/runtime-main.eb37ddef.js.map",
+    "static/js/2.988d7a93.chunk.js": "/reibun-kensaku/static/js/2.988d7a93.chunk.js",
+    "static/js/2.988d7a93.chunk.js.map": "/reibun-kensaku/static/js/2.988d7a93.chunk.js.map",
+    "index.html": "/reibun-kensaku/index.html",
+    "static/css/main.59fbe4a5.chunk.css.map": "/reibun-kensaku/static/css/main.59fbe4a5.chunk.css.map",
+    "static/js/2.988d7a93.chunk.js.LICENSE.txt": "/reibun-kensaku/static/js/2.988d7a93.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.eb37ddef.js",
+    "static/js/2.988d7a93.chunk.js",
+    "static/css/main.59fbe4a5.chunk.css",
+    "static/js/main.b13707f7.chunk.js"
+  ]
+}
