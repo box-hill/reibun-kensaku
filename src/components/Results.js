@@ -8,6 +8,7 @@ function Results(props) {
         {search: '美味しくなくない', explaination: 'Japanese slang: '},
         {search: 'ほんまに分からん', explaination: 'Dialect and slang: '},
         {search: '処方せんなしで買え', explaination: 'Incomplete verb conjugation: '},
+        {search: 'Facebook社が開発した', explaination: 'Japanese with English words: '},
         {search: 'グラスの数が足りない', explaination: 'Check for correct sentences: '},
         {search: 'ガラスの数が足りない', explaination: 'Incorrect searches yield no results: '},
     ]

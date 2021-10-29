@@ -25,18 +25,19 @@ function App() {
   const [history, setHistory] = useState([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
-
+ 
   // check if user is logged in
   function checkUser(){
     firebase.auth().onAuthStateChanged(function(user) {
         if(user){
             setLoggedIn(true);
+            setInitialLoginCheck(true);
             retrieveHistory();   
         } else { 
             setLoggedIn(false);
+            setInitialLoginCheck(true);
             retrieveHistory();
         }
-        setInitialLoginCheck(true);
     })
   }
 
@@ -47,7 +48,7 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if(initialLogin) retrieveHistory();
+    retrieveHistory();
   }, [loggedIn]);
   
   // save history to cloud/localStorage and setState
@@ -149,12 +150,11 @@ function App() {
     setLoadingHistory(false);
   }
 
-  function googleLogin() {
+  function googleLogin(e) {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider)
         .then(result => {
-            const user = result.user;
-            console.log(user)
+            console.log('User has Logged In')
         })
         .catch(console.log);
     retrieveHistory();
