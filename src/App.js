@@ -1,4 +1,4 @@
-import './styles/App.css'
+import './styles/styles.css'
 
 import Results from './components/Results';
 import History from './components/History';
