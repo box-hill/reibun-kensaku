@@ -297,6 +297,22 @@ article {
   background-color: #f6f8fa;
 }
 
+.site-logo {
+  color: #ffffff;
+  background-color: none;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-size: 25px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.site-logo:hover {
+  color:rgb(212, 212, 212);
+}
+
 @media screen and (max-width:1250px) {
   .main-content {
     width: 100%;

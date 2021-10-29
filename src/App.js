@@ -17,10 +17,10 @@ const { REACT_APP_GOOGLE_API } = process.env;
 
 function App() {
 
-  const [loggedIn, setLoggedIn] = useState(undefined);
+  const [initialLogin, setInitialLoginCheck] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [justSearched, setJustSearched] = useState(false);
-
   const [parsedResults, setParsedResults] = useState([]);
   const [history, setHistory] = useState([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
@@ -31,9 +31,12 @@ function App() {
     firebase.auth().onAuthStateChanged(function(user) {
         if(user){
             setLoggedIn(true);
+            retrieveHistory();   
         } else { 
             setLoggedIn(false);
+            retrieveHistory();
         }
+        setInitialLoginCheck(true);
     })
   }
 
@@ -44,12 +47,8 @@ function App() {
   }, [])
 
   useEffect(() => {
-    retrieveHistory();
-  }, [loggedIn])
-
-  useEffect(() => { // setLoadingHistory to false once history stops updating.
-    setLoadingHistory(false);
-  }, [history])
+    if(initialLogin) retrieveHistory();
+  }, [loggedIn]);
   
   // save history to cloud/localStorage and setState
   function saveHistory(string, numResults){
@@ -57,6 +56,7 @@ function App() {
     if(loggedIn) {
       const user = firebase.auth().currentUser;
       const uniqueId = user.uid;
+      console.log(uniqueId);
 
       const date = new Date();
       const time = date.getTime();
@@ -107,9 +107,9 @@ function App() {
     }
   }     
   function retrieveHistory(){
+    setLoadingHistory(true);
     // check if user is logged in, and then retrieve History, setHistory, and also remove old searches
     if(loggedIn){
-      setLoadingHistory(true);
       const user = firebase.auth().currentUser;
       const uniqueId = user.uid;
 
@@ -125,8 +125,6 @@ function App() {
           historyArray.push({id:doc.id, ...obj});
         })
         setHistory(historyArray);
-        console.log(historyArray);
-
         // remove history that exceeds 15
         const maxHistoryLength = 15;
         let idsToRemove = [];
@@ -145,16 +143,20 @@ function App() {
       .catch((error => {
         console.log("Error getting documents: ", error);
       }))
+      console.log('Retrieved Cloud History: ', history);
     }
     else {
       let localHistory = localStorage.getItem('pastSearches');
       localHistory = JSON.parse(localHistory);
-      
-      if(localHistory === null || localHistory === undefined || localHistory[0] === null) return;
-      console.log('localHistoryas dad is: ', localHistory);
+      if(localHistory === null || localHistory === undefined || localHistory[0] === null){
+        setHistory([]);
+        setLoadingHistory(false);
+        return;
+      }
       setHistory(localHistory);
+      console.log('Retrieved Local History: ', localHistory);
     }
-    console.log('Retrieved History: ', history);
+    setLoadingHistory(false);
   }
 
   function googleLogin() {
@@ -165,6 +167,7 @@ function App() {
             console.log(user)
         })
         .catch(console.log);
+    retrieveHistory();
   }
 
   function logUserOut(){
@@ -346,7 +349,8 @@ function App() {
           <NavSearchBar search={search} handleChange={handleChange}/>
         </div>
         <div className="nav-items">
-          {loggedIn ? <NavItem text="Sign out" icon={faGoogle} onClick={logUserOut}></NavItem> : <NavItem text="Sign in" icon={faGoogle} onClick={googleLogin}></NavItem>}
+          {loggedIn ? <NavItem text="Sign out" icon={faGoogle} onClick={logUserOut} initialLogin={initialLogin}></NavItem> : 
+          <NavItem text="Sign in" icon={faGoogle} onClick={googleLogin} initialLogin={initialLogin}></NavItem>}
         </div>
       </Navbar>
       <div className='flex-center'>
@@ -384,13 +388,13 @@ function History(props) {
       </div>
     );
   }
-  if(props.history[0] === null || props.history[0] === undefined){
-    return  (
-      <div className='history'>
-        <div>Try searching something!</div>
-      </div>
-    );
-  }
+  // if(props.history[0] === null || props.history[0] === undefined){
+  //   return  (
+  //     <div className='history'>
+  //       <div>Try searching something!</div>
+  //     </div>
+  //   );
+  // }
   if(props.history.length === 0) {
     return  (
       <div className='history'>
@@ -426,6 +430,7 @@ function Navbar(props) {
 }
 
 function NavItem(props) {
+  if(!props.initialLogin) return null; // loader here
   return (
     <li className="nav-item">
       <button herf="#" className="nav-button" onClick={props.onClick}>
