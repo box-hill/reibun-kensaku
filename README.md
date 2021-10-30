@@ -11,10 +11,14 @@ Popular Japanese sentence seachers (such as yourei.jp) are very good at generati
 Where my website differs, is that it searches the web for example sentences. This means that anyone who writes a blog or tweets something can contribute to sentences generated. This results in stronger matches with context from a myriad of sources.  
 
 Here's how my website compares to other sentence searchers:  
-| Search          |             RK        | Jisho | 
-| ---:            |      :---:            | :---: | 
-| 美味しくなくない  | :heavy_check_mark:   | :x:    |
-| ほんまに分からん  | :heavy_check_mark:   | :x:    |
+| Search                          | [RK](https://reibun-kensaku.web.app/)| [Yourei](yourei.jp) | [Jisho](jisho.org) |  [Kanshudo](kanshudo.com/searcht) |  
+| :---:                          |              :---:                   | :---:               |  :---:             |               :---:              | 
+|  どうして (Single Word)         |             :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark: | :heavy_check_mark:              |
+|  分かろうとしない (Phrase)        |               :heavy_check_mark:     |      :x:            |       :x:         |          :x:                  |
+|  Facebook社が開発した (Eng & Jap)|               :heavy_check_mark:     |      :x:            |       :x:         |          :x:                  |
+|  処方せんなしで買え (Incomplete Verb Conjugation)|  :heavy_check_mark:     |      :x:            |       :x:         |          :x:                  |
+| 美味しくなくない (Slang)          | :heavy_check_mark:   |      :x:            |       :x:         |          :x:                  |
+| ほんまに分からん (Dialect) | :heavy_check_mark:   |      :x:            |       :x:         |          :x:                  | 
 ### 💪 Features
  * Example sentences generated from native speakers
  * Not limited to a dictionary API/database query
