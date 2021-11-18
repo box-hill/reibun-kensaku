@@ -36,6 +36,18 @@ a {
     &:hover {
         background-color: rgb(218, 218, 218);
     }
+    animation: 0.5s slide-in;
+}
+
+@keyframes slide-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
 }
 
 /* Loader */
